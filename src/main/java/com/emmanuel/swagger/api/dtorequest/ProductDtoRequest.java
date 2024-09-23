@@ -1,9 +1,9 @@
-package com.emmanuel.swagger.model;
+package com.emmanuel.swagger.api.dtorequest;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description="This is the product payload.")
-public class Product {
+public class ProductDtoRequest {
 	
 	@Schema(description="This is the unique id for each product.", example="7")
 	private Integer id;
@@ -14,7 +14,7 @@ public class Product {
 	@Schema(description="This is the product price.", example="2000")
 	private Integer price;
 	
-	public Product(Integer id, String name, Integer price) {
+	public ProductDtoRequest(Integer id, String name, Integer price) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -43,6 +43,11 @@ public class Product {
 
 	public void setPrice(Integer price) {
 		this.price = price;
+	}
+
+	@Override
+	public String toString() {
+		return "ProductDtoRequest [id=" + id + ", name=" + name + ", price=" + price + "]";
 	}
 	
 }
