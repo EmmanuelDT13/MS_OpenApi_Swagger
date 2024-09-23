@@ -77,7 +77,6 @@ public class ProductController {
 	}
 	
 	
-	//HOOOLAAAAAA
 	@Operation(summary="Deletes the product", description="By this method we remove one element from the database. We need to place the idProduct.")
 	@DeleteMapping(path="delete/{idProduct}")
 	@ApiResponse(responseCode="200", description="The element has been successfully removed from the database.")
