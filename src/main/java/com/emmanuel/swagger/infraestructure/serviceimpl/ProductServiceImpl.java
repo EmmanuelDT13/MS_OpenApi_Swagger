@@ -5,6 +5,7 @@ import com.emmanuel.swagger.domain.repository.ProductRepository;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -47,6 +48,12 @@ public class ProductServiceImpl implements IProductService, InitializingBean, IC
 		return productsResponse;
 	}
 
+	public Optional<Product> findOneByList(String productName) {
+		List<Product> products = this.ProductRepository.findAll();
+		return products.stream().filter(el -> el.getName().equals(productName)).findFirst();
+		
+	}
+	
 	//If I create one new product, I am cleaning the cache productList, becausa I don't want to get the deprecated version of
 	//the list that the cache has currently where there was no the new product that I have added.
 	@Override
@@ -57,7 +64,7 @@ public class ProductServiceImpl implements IProductService, InitializingBean, IC
 		product.setId(productToSave.getId());
 		return product;
 	}
-
+ 
 	//If I update one product, I am goint to update its reference in cache, I don't need to remove it.
 	//What I do remove is the productList again, because I want to have consistency.
 	@Override
