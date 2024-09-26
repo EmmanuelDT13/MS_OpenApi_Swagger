@@ -17,11 +17,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Tag;
 import com.emmanuel.swagger.domain.model.Product;
 import com.emmanuel.swagger.api.dtorequest.ProductDtoRequest;
 import com.emmanuel.swagger.domain.repository.ProductRepository;
-import com.emmanuel.swagger.infraestructure.service.IProductService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestInstance;
@@ -34,6 +35,10 @@ import org.junit.jupiter.api.condition.EnabledOnJre;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.JRE;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -165,17 +170,64 @@ class ProductServiceImplTest {
 		Product product1 = new Product(1,"Laptop", 2000);
 		Product product2 = new Product(1,"PC", 2500);
 		List<Product> products = List.of(product1, product2);
-		
 		when(productRepository.findAll()).thenReturn(products);
-		
-		
-		//List<Product> productsFromDb = productServiceImpl.getAllProducts().stream().map(el->new Product(el.getId(),el.getName(),el.getPrice())).toList();
 		Product lap = productServiceImpl.findOneByList("Laptop").orElseThrow();
-		
 		Assertions.assertEquals(product1.getName(), lap.getName());
-		
 	}
 
+	@RepeatedTest(value=3, name="{displayName} - Iteración: {currentRepetition} of {totalRepetitions}" )
+	@DisplayName(value="Repeated Test")
+	void testFilterOneProductRepeated(RepetitionInfo info) {
+		
+		if(info.getCurrentRepetition() == 2) System.out.println("Hey there! I am the second repetition.");
+		
+		Product product1 = new Product(1,"Laptop", 2000);
+		Product product2 = new Product(1,"PC", 2500);
+		List<Product> products = List.of(product1, product2);
+		when(productRepository.findAll()).thenReturn(products);
+		Product lap = productServiceImpl.findOneByList("Laptop").orElseThrow();
+		Assertions.assertEquals(product1.getName(), lap.getName());
+	}
+	
+	@DisplayName("My ParameterizedValueSourceTest")
+	@ParameterizedTest(name = "{displayName} - This is the repetition: {index}, and its value is: {0}")
+	@ValueSource(strings = {"Laptop", "PC", "Iphone", "Tablet"})
+	void testFilterOneProductParametrized(String nameProduct) {
+		Product product1 = new Product(1,nameProduct, 2000);
+		List<Product> products = List.of(product1);
+		when(productRepository.findAll()).thenReturn(products);
+		Product lap = productServiceImpl.findOneByList(nameProduct).orElseThrow();
+		Assertions.assertEquals(product1.getName(), lap.getName());
+	}
+	
+	@DisplayName("My ParameterizedCSVSourceTest")
+	@ParameterizedTest(name = "{displayName} - This is the repetition: {index}, and its value is: {0}")
+	@CsvSource({"1,Laptop", "2,PC", "3,Iphone", "4,Tablet"})
+	void testFilterOneProductParametrizedCsv(String id, String nameProduct) {
+		Product product1 = new Product(Integer.parseInt(id), nameProduct, 2000);
+		List<Product> products = List.of(product1);
+		when(productRepository.findAll()).thenReturn(products);
+		Product lap = productServiceImpl.findOneByList(nameProduct).orElseThrow();
+		Assertions.assertEquals(product1.getName(), lap.getName());
+		Assertions.assertTrue(product1.getId().equals(lap.getId()));
+	}
+	
+	@DisplayName("My ParameterizedMethodSourceTest")
+	@ParameterizedTest(name = "{displayName} - This is the repetition: {index}, and its value is: {0}")
+	@MethodSource("giveMeTheTestList")
+	void testFilterOneProductParametrizedMethod(String nameProduct) {
+		Product product1 = new Product(1, nameProduct, 2000);
+		List<Product> products = List.of(product1);
+		when(productRepository.findAll()).thenReturn(products);
+		Product lap = productServiceImpl.findOneByList(nameProduct).orElseThrow();
+		Assertions.assertEquals(product1.getName(), lap.getName());
+		Assertions.assertTrue(product1.getId().equals(lap.getId()));
+	}
+	
+	static List<String> giveMeTheTestList(){
+		return List.of("Laptop", "PC", "Iphone");
+	}
+	
 	@Test
 	@Disabled
 	void testDeleteProduct() {
