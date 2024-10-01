@@ -5,15 +5,14 @@ import com.emmanuel.swagger.domain.repository.ProductRepository;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
 import com.emmanuel.swagger.api.dtorequest.ProductDtoRequest;
 import com.emmanuel.swagger.infraestructure.service.ICacheService;
 import com.emmanuel.swagger.infraestructure.service.IProductService;
@@ -45,6 +44,11 @@ public class ProductServiceImpl implements IProductService, InitializingBean, IC
 			return new ProductDtoRequest(el.getId(), el.getName(), el.getPrice());
 		}).collect(Collectors.toList());
 		return productsResponse;
+	}
+
+	public Optional<Product> findOneByList(String productName) {
+		List<Product> products = this.ProductRepository.findAll();
+		return products.stream().filter(el -> el.getName().equals(productName)).findFirst();
 	}
 
 	//If I create one new product, I am cleaning the cache productList, becausa I don't want to get the deprecated version of
