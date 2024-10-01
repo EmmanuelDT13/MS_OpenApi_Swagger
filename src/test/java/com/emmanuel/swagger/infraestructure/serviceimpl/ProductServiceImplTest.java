@@ -1,13 +1,19 @@
 package com.emmanuel.swagger.infraestructure.serviceimpl;
 
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.atMostOnce;
+import static org.mockito.Mockito.doCallRealMethod;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -35,6 +41,7 @@ import org.junit.jupiter.api.condition.EnabledOnJre;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.JRE;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -42,9 +49,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)		//Indicates that we are going to create only one class instance for all the test cases.
 //@TestInstance(TestInstance.Lifecycle.PER_METHOD)	//Indicates that we are going to create one instance of the class for wach test case.
+@ExtendWith(MockitoExtension.class) //Esta es la alternativa a MockitoAnnotations.openMocks(this)
 class ProductServiceImplTest {
 
 	private TestInfo testInfo;
@@ -76,7 +85,7 @@ class ProductServiceImplTest {
 		productFromDb = new ProductDtoRequest(1, "Laptop", 200);
 		this.testInfo = testInfo;
 		this.testReporter = testReporter;
-		MockitoAnnotations.openMocks(this);
+		//MockitoAnnotations.openMocks(this);	//Esta es la alternativa a ExtendWith(MockitoExtension.class)
 	}
 	
 	@AfterEach
@@ -202,8 +211,8 @@ class ProductServiceImplTest {
 	
 	@DisplayName("My ParameterizedCSVSourceTest")
 	@ParameterizedTest(name = "{displayName} - This is the repetition: {index}, and its value is: {0}")
-	@CsvSource({"1,Laptop", "2,PC", "3,Iphone", "4,Tablet"})
-	void testFilterOneProductParametrizedCsv(String id, String nameProduct) {
+	@CsvSource({"1,Laptop,Ocatio", "2,PC,Gerónimo", "3,Iphone,Luis", "4,Tablet,Ernesto"})
+	void testFilterOneProductParametrizedCsv(String id, String nameProduct, String owner) {
 		Product product1 = new Product(Integer.parseInt(id), nameProduct, 2000);
 		List<Product> products = List.of(product1);
 		when(productRepository.findAll()).thenReturn(products);
@@ -219,9 +228,33 @@ class ProductServiceImplTest {
 		Product product1 = new Product(1, nameProduct, 2000);
 		List<Product> products = List.of(product1);
 		when(productRepository.findAll()).thenReturn(products);
+		
 		Product lap = productServiceImpl.findOneByList(nameProduct).orElseThrow();
 		Assertions.assertEquals(product1.getName(), lap.getName());
 		Assertions.assertTrue(product1.getId().equals(lap.getId()));
+		
+		verify(productRepository, atMost(1)).save(any(Product.class));
+	}
+	
+	@DisplayName("My DoThrow method")
+	@ParameterizedTest(name = "{displayName} - This is the repetition: {index}, and its value is: {0}")
+	@MethodSource("giveMeTheTestList")
+	void testDoThrow(String nameProduct) {
+		Product product1 = new Product(1, nameProduct, 2000);
+		ProductDtoRequest request = new ProductDtoRequest(1, "Raqueta", 500);
+		List<Product> products = List.of(product1);
+		when(productRepository.findAll()).thenReturn(products);
+		
+		Product lap = productServiceImpl.findOneByList(nameProduct).orElseThrow();
+		Assertions.assertEquals(product1.getName(), lap.getName());
+		Assertions.assertTrue(product1.getId().equals(lap.getId()));
+		
+		ProductDtoRequest producto = productServiceImpl.createOneProduct(request);
+		
+		Assertions.assertEquals(producto.getName(), request.getName());
+		
+		doThrow(Exception.class).when(productRepository).deleteById(anyInt());
+		verify(productRepository, atMostOnce()).save(any(Product.class));
 	}
 	
 	static List<String> giveMeTheTestList(){

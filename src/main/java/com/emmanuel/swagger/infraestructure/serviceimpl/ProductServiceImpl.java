@@ -32,6 +32,8 @@ public class ProductServiceImpl implements IProductService, InitializingBean, IC
 	@Override
 	@Cacheable(value="product", key = "#idProduct")
 	public ProductDtoRequest getOneProduct(Integer idProduct) {
+		
+		System.out.println("Saludos!");
 		Product product = ProductRepository.findById(idProduct).get();
 		ProductDtoRequest productResponse = new ProductDtoRequest(product.getId(), product.getName(), product.getPrice()); 
 		return productResponse;
