@@ -7,14 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
 import com.emmanuel.swagger.api.dtorequest.ProductDtoRequest;
 import com.emmanuel.swagger.infraestructure.service.ICacheService;
 import com.emmanuel.swagger.infraestructure.service.IProductService;
@@ -32,8 +30,6 @@ public class ProductServiceImpl implements IProductService, InitializingBean, IC
 	@Override
 	@Cacheable(value="product", key = "#idProduct")
 	public ProductDtoRequest getOneProduct(Integer idProduct) {
-		
-		System.out.println("Saludos!");
 		Product product = ProductRepository.findById(idProduct).get();
 		ProductDtoRequest productResponse = new ProductDtoRequest(product.getId(), product.getName(), product.getPrice()); 
 		return productResponse;
@@ -53,9 +49,8 @@ public class ProductServiceImpl implements IProductService, InitializingBean, IC
 	public Optional<Product> findOneByList(String productName) {
 		List<Product> products = this.ProductRepository.findAll();
 		return products.stream().filter(el -> el.getName().equals(productName)).findFirst();
-		
 	}
-	
+
 	//If I create one new product, I am cleaning the cache productList, becausa I don't want to get the deprecated version of
 	//the list that the cache has currently where there was no the new product that I have added.
 	@Override
@@ -66,7 +61,7 @@ public class ProductServiceImpl implements IProductService, InitializingBean, IC
 		product.setId(productToSave.getId());
 		return product;
 	}
- 
+
 	//If I update one product, I am goint to update its reference in cache, I don't need to remove it.
 	//What I do remove is the productList again, because I want to have consistency.
 	@Override
