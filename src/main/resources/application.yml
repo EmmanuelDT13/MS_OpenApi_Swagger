@@ -1,0 +1,49 @@
+resilience4j.circuitbreaker:
+  instances:
+    cellphones: #Este es el nombre la instancia en específico que estaremos utilizando. Podemos crear todas las que queramos
+                #y posteriormente asignarlas mediane @CircuitBreaker al método que deseamos aplicar la configuración.  
+    
+      #Configuraciones básicas
+    
+      sliding-window-size: 10   #Define el total de llamadas a tomar en consideración para realizar los cambios de estatus.
+      sliding-window-type: count-based  #Define si calculará la taza de fallos por cantidad de llamadas fallidas o por tiempo.
+      
+      failure-rate-threshold: 50  #Define el porcentaje de llamadas fallidas que se debe considerar para pasar de CLOSED - OPEN.
+     
+      minimum-number-of-calls: 5  #Mínimo número de llamadas que deben realizarse antes de cambiar de CLOSED - OPEN (Aún si
+                                  #hay errores, CircuitBreaker no se abrirá porque se debe llamar el mínimo establecido).
+
+      wait-duration-in-open-state: 10000  #Cantidad de milisegundos que debe durar el estatus en OPEN para pasar a HALF-OPEN.
+      
+      automatic-transition-from-open-to-half-open-enabled: true #Una vez complidos los segundos establecidos en OPEN,
+                                                                #de manera automática pasaremos a HALF-OPEN
+      
+      permitted-number-of-calls-in-half-open-state: 3 #Define el número máximo de llamadas permitidas desde estatus HALF-OPEN.
+      
+      register-health-indicator: true #Permite que Spring Boot Starter Actuator tome las métricas de salud y las muestre.
+      
+      ignore-exceptions:  #Define cuáles excepciones NO deberían ser consideradas como fallo (CircuitBreaker la ignorará).
+        - java.lang.IllegalArgumentException
+      
+      writable-stack-trace-enabled: false #Define si CircuitBreaker incluirá toda la pila de excepciones ocurridas. (Afecta rendimiento).
+      
+      #Configuraciones avanzadas:
+      
+      slow-call-duration-threshold: 2s  #Define los segundos que deberá tardar un llamado para considerarse lento.
+      slow-call-rate-threshold: 50  #Define el porcentajas de llamadas lentas que permitirá antes de cambiar de estatus.
+      
+      event-consumer-buffer-size: 10 #Define la cantidad de últimos eventos que se guardarán (Sirve para monitoreo).
+      
+      
+management:
+  health:
+    circuitBreakers:
+      enabled: true  
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+      
