@@ -1,4 +1,6 @@
 package com.emmanuel.swagger.infraestructure.feign.clients;
+import java.util.List;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import com.emmanuel.swagger.infraestructure.feign.beans.CelularFallback;
@@ -9,7 +11,11 @@ import com.emmanuel.swagger.infraestructure.feign.dtoresponse.Celular;
 fallback=CelularFallback.class)
 public interface ICelularClient {
 	
+	@GetMapping("${external.feign.apiphone.getallcellphones}")
+	public List<Celular> getCelularesFromFeignCliente();
+	
 	@GetMapping(path="${external.feign.apiphone.getone}")
 	public Celular getCelularFromFeignClient();
 	
 }
+
