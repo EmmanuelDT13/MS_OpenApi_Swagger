@@ -19,6 +19,12 @@ public class CellphoneController {
 		
 	}
 	
+	@GetMapping(path="/getAll")
+	public ResponseEntity<Celular> getAllCellphones(){
+		Celular my_cellphone = iCellphoneService.getCellPhone();
+		return new ResponseEntity<>(my_cellphone, HttpStatus.OK);
+	}
+	
 	@GetMapping(path="/getOne")
 	public ResponseEntity<Celular> getOneCellphone(){
 		Celular my_cellphone = iCellphoneService.getCellPhone();

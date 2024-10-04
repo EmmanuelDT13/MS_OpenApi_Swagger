@@ -1,6 +1,6 @@
 resilience4j.circuitbreaker:
   instances:
-    cellphones: #Este es el nombre la instancia en específico que estaremos utilizando. Podemos crear todas las que queramos
+    cellphone: #Este es el nombre la instancia en específico que estaremos utilizando. Podemos crear todas las que queramos
                 #y posteriormente asignarlas mediane @CircuitBreaker al método que deseamos aplicar la configuración.  
     
       #Configuraciones básicas
