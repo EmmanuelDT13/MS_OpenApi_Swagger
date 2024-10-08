@@ -1,6 +1,8 @@
 package com.emmanuel.swagger.api.controller;
 import com.emmanuel.swagger.infraestructure.feign.dtoresponse.Celular;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +22,8 @@ public class CellphoneController {
 	}
 	
 	@GetMapping(path="/getAll")
-	public ResponseEntity<Celular> getAllCellphones(){
-		Celular my_cellphone = iCellphoneService.getCellPhone();
+	public ResponseEntity<List<Celular>> getAllCellphones(){
+		List<Celular> my_cellphone = iCellphoneService.getAllPhones();
 		return new ResponseEntity<>(my_cellphone, HttpStatus.OK);
 	}
 	
