@@ -1,12 +1,12 @@
 package com.emmanuel.swagger.infraestructure.serviceimpl;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import com.emmanuel.swagger.infraestructure.feign.clients.ICelularClient;
 import com.emmanuel.swagger.infraestructure.feign.dtoresponse.Celular;
 import com.emmanuel.swagger.infraestructure.service.ICellphoneService;
 import com.emmanuel.swagger.infraestructure.util.exceptions.CelularNotFoundException;
-
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @Service
@@ -14,17 +14,27 @@ public class CellphoneServiceImpl implements ICellphoneService{
 
 	private final ICelularClient iCelularClient;
 
+	private final io.github.resilience4j.circuitbreaker.CircuitBreaker circuitBreaker;
 	
-    public CellphoneServiceImpl(ICelularClient iCelularClient) {
+    public CellphoneServiceImpl(ICelularClient iCelularClient, @Qualifier("circuitBreakerBean") io.github.resilience4j.circuitbreaker.CircuitBreaker circuitBreaker) {
         this.iCelularClient = iCelularClient;
+        this.circuitBreaker = circuitBreaker;
     }
     
 	@Override
-	@CircuitBreaker(name="circuitBreakerBean", fallbackMethod="fallBackCelulars")
 	public List<Celular> getAllPhones() {
-		List<Celular> my_cellphones = iCelularClient.getCelularesFromFeignCliente();
-		System.out.println(my_cellphones);
-		return my_cellphones;
+		
+		try {
+			circuitBreaker.executeSupplier(() ->{
+				List<Celular> my_cellphones = iCelularClient.getCelularesFromFeignCliente();
+				System.out.println(my_cellphones);
+				return my_cellphones;
+			});
+			
+		}catch(Exception e) {
+			return fallBackCelulars(e);
+		}
+		return null;
 	}
 
     
