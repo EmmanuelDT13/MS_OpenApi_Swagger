@@ -1,3 +1,19 @@
+spring:
+  application:
+    name: Spring_Framework_Portfolio
+
+#Eureka Client.
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    instance-id: spring_portfolio
+    hostname: localhost
+    metadata-map:
+      instance-id: spring_portfolio
+
+#CircuitBreaker design pattern.
 resilience4j.circuitbreaker:
   instances:
     cellphone: #Este es el nombre la instancia en específico que estaremos utilizando. Podemos crear todas las que queramos
