@@ -11,7 +11,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 @Configuration
 public class CircuitBreakerConfiguration {
 
-	@Bean
+	@Bean(name="circuitBreakerBean")
 	CircuitBreaker getCircuitBreakerBean() {
 		
 		//Este objeto nos permitirá definir y configurar nuestra instancia de CircuitBreaker.
